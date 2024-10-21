@@ -58,7 +58,7 @@ def generate_launch_description():
         "map": os.path.join(
             get_package_share_directory('tmc_potential_maps'),
             'maps/apartment/map.yaml'),
-        "initial_orientation_xyzw": "0.0,0.0,0.0,0.1",
+        "initial_orientation_xyzw": "0.0,0.0,0.0,1.0",
         "robot_pos": "5.0,6.6,0.0,0.0",
         "ground_truth_xyz": "-5.0\\ -6.6\\ 0.0",
         "ground_truth_rpy": "0.0\\ 0.0\\ 0.0"}
