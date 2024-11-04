@@ -21,6 +21,8 @@
   <exec_depend>tmc_robot_rrt_planner_node</exec_depend>
   <exec_depend>hsrb_timeopt_ros</exec_depend>
   <exec_depend>hsrb_manipulation_launch</exec_depend>
+  <exec_depend>hsrb_launch_utils</exec_depend>
+  <exec_depend>tmc_gazebo_worlds</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
