@@ -47,8 +47,6 @@ def launch_setup(context,
                  robot_name,
                  map_info,
                  use_navigation,
-                 set_initial_pose,
-                 initial_orientation_xyzw,
                  robot_pos,
                  use_odom_ground_truth,
                  ground_truth_xyz,
@@ -62,8 +60,6 @@ def launch_setup(context,
     robot_name_value = context.perform_substitution(robot_name)
     map_info_value = context.perform_substitution(map_info)
     use_navigation_value = context.perform_substitution(use_navigation)
-    set_initial_pose_value = context.perform_substitution(set_initial_pose)
-    initial_orientation_xyzw_value = context.perform_substitution(initial_orientation_xyzw)
 
     ground_truth_xyz_value = context.perform_substitution(ground_truth_xyz)
     ground_truth_rpy_value = context.perform_substitution(ground_truth_rpy)
@@ -125,8 +121,6 @@ def launch_setup(context,
         launch_arguments={
             'map': map_info_value,
             'use_sim_time': 'True',
-            'set_initial_pose': set_initial_pose_value,
-            'initial_orientation_xyzw': initial_orientation_xyzw_value,
             'namespace': ''}.items(),
         condition=IfCondition(
             LaunchConfiguration('use_navigation')))
@@ -182,8 +176,6 @@ def generate_launch_description():
                         args=[LaunchConfiguration('robot_name'),
                               LaunchConfiguration('map'),
                               LaunchConfiguration('use_navigation'),
-                              LaunchConfiguration('set_initial_pose'),
-                              LaunchConfiguration('initial_orientation_xyzw'),
                               LaunchConfiguration('robot_pos'),
                               LaunchConfiguration('use_odom_ground_truth'),
                               LaunchConfiguration('ground_truth_xyz'),

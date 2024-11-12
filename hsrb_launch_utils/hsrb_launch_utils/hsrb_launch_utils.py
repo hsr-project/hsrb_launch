@@ -46,7 +46,6 @@ def declare_launch_arguments():
     declared_arguments.append(DeclareLaunchArgument('use_navigation', default_value="true"))
     declared_arguments.append(DeclareLaunchArgument('fast_physics', default_value="false"))
     declared_arguments.append(DeclareLaunchArgument('robot_name', default_value=os.getenv("ROBOT_NAME", "hsrb")))
-    declared_arguments.append(DeclareLaunchArgument('set_initial_pose', default_value="True"))
     declared_arguments.append(DeclareLaunchArgument(
         'description_package', default_value='hsrb_description',
         description='Description package with robot URDF/oo files.'))
