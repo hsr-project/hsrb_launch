@@ -1,30 +1,28 @@
-'''
-Copyright (c) 2024 TOYOTA MOTOR CORPORATION
-All rights reserved.
-Redistribution and use in source and binary forms, with or without
-modification, are permitted (subject to the limitations in the disclaimer
-below) provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-* Neither the name of the copyright holder nor the names of its contributors may be used
-  to endorse or promote products derived from this software without specific
-  prior written permission.
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
-LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-'''
+# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
+# below) provided that the following conditions are met:
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of the copyright holder nor the names of its contributors may be used
+#   to endorse or promote products derived from this software without specific
+#   prior written permission.
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+# LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
 #!/usr/bin/python3
 from __future__ import print_function
 
@@ -59,9 +57,9 @@ MESSAGES = {
 }
 
 """
-If this node is standing up, it will be generally stood up, and if you can Kill, you will be able to do other things.
-Node name set used
-I suppressed basic things
+If this node is up, it can be assumed that other nodes are mostly up as well / if this node could be killed, others likely could too.
+Set of node names in use
+Basic ones are covered
 """
 CHECK_NODE = {"robot_state_publisher", "joint_state_publisher",
               "joint_state_broadcaster", "servo_diagnostic_broadcaster",
@@ -83,12 +81,12 @@ class RobotService:
         self.keep_nodes_time = keep_nodes_time
         self.lang = lang
         personal_name = os.getenv("PERSONAL_NAME", "HSR")
-        MESSAGES['HSR start']['ja'][0] = personal_name + u"スタート"
+        MESSAGES['HSR start']['ja'][0] = personal_name + u" Start"
         MESSAGES['HSR start']['en'][0] = personal_name + u" start"
 
         if personal_name != "HSR":
-            # I intentionally include comma to give the utterance between them
-            MESSAGES['HSR stopped']['ja'][0] = personal_name + u",停止しました"
+            # Intentionally inserting commas to create pauses in speech
+            MESSAGES['HSR stopped']['ja'][0] = personal_name + u", Stopped"
         MESSAGES['HSR stopped']['en'][0] = personal_name + u" stopped"
 
         self.was_emergency_on = False
@@ -117,7 +115,7 @@ class RobotService:
 
         signal.signal(signal.SIGTERM, self.signal)
         signal.signal(signal.SIGINT, self.signal)
-        # Drop the child process without any problems even when it ends with an internal error
+        # Properly terminate child processes even when terminated by an internal error
         atexit.register(self.term_nodes)
 
     def make_subscriber(self):
@@ -127,7 +125,7 @@ class RobotService:
         u"""Signal handler"""
         self.running = False
         if sig != self.previous_signal:
-            # If the same signal comes multiple times while stopping the node, ignore it
+            # Ignore if the same signal is received multiple times during node shutdown
             self.previous_signal = sig
             self.term_nodes()
         rclpy.try_shutdown()
@@ -135,23 +133,23 @@ class RobotService:
         sys.exit(sig)
 
     def kill_process(self, proc):
-        u"""Drop all processes including grandchildren"""
+        u"""Terminate all processes including grandchild processes"""
         try:
             parent = psutil.Process(proc.pid)
         except psutil.NoSuchProcess:
             return
-        # Get all the child processes recursively
+        # Recursively retrieve all child processes
         children = parent.children(recursive=True)
-        # Drop the target process
+        # Terminate the target process
         proc.terminate()
         proc.wait()
-        # End the remaining child process
+        # Terminate remaining child processes
         for child in children:
             if child.is_running():
                 child.kill()
 
     def term_nodes(self, all_nodes=True):
-        u"""Stop node"""
+        u"""Stop nodes"""
         if all_nodes:
             if self.proc_app:
                 self.notify('Killing all nodes', True)
@@ -162,13 +160,15 @@ class RobotService:
             self.proc_device = None
 
     def launch_nodes(self, all_nodes=True, timeout=15.0):
-        u"""Start a node"""
+        u"""Start nodes"""
         self.node.get_logger().info("Start launching")
-        # Start a node other than the device system
-        # TODO(Masayuki Masuda): 起動スクリプトが出来たら追加
+        # Start non-device-related nodes
         if all_nodes:
-            pass
-        # Start the device node
+            self.proc_app = subprocess.Popen(
+                ['/opt/ros/{0}/bin/ros2'.format(os.environ['ROS_DISTRO']), 'launch',
+                 'hsrb_robot_launch', 'boot_app.launch.py'],
+                stdout=None, stderr=None, close_fds=True)
+        # Start device-related nodes
         self.proc_device = subprocess.Popen(
             ['/opt/ros/{0}/bin/ros2'.format(os.environ['ROS_DISTRO']), 'launch',
              'hsrb_bringup', 'robot.launch.py'],
@@ -198,9 +198,9 @@ class RobotService:
         return False
 
     def watch(self):
-        u"""Surveillance until the emergency stop is ON/OFF at regular intervals.
+        u"""Monitor until the emergency stop, which is issued at regular intervals, becomes ON.
 
-        If the publisher falls and does not have more than Duration or more, if it is no longer Running.
+        Exit when the issuing source is down and there is no communication for longer than the duration, or when it is no longer running.
         """
         self.last_subscribed = self.node.get_clock().now()
         duration = rclpy.time.Duration(seconds=self.watch_timeout)
@@ -214,7 +214,7 @@ class RobotService:
         return True
 
     def notify(self, message, wait, *args, **kwargs):
-        u"""Development notification"""
+        u"""Notification via speech"""
         self.node.get_logger().info(message)
         if message in MESSAGES:
             if self.lang in ('ja', 'en'):
@@ -245,26 +245,25 @@ class RobotService:
             self.notify('HSR start', True)
             self.diag_pub.publish()
             success = self.launch_nodes(is_all)
-            # When unintended behavior occurs, make TRUE to restart all nodes
+            # Set to True to restart all nodes when unintended behavior occurs
+            # TODO(Takeshita) fast restartの実装がないので，結局常にtrue
             is_all = True
             if success:
-                is_all = self.watch()
+                self.watch()
                 self.notify('HSR stopped', False)
 
-                if not is_all:
-                    # If there is no operation for a certain period, stop all nodes
-                    detected = self.wait_until(lambda: self.button_was_reset,
-                                               timeout=60.0 * self.keep_nodes_time)
-                    if not detected:
-                        is_all = True
-                        self.notify('Timeout. Start shutdown', True, self.keep_nodes_time)
+                # Stop all nodes if there is no operation for a certain period
+                detected = self.wait_until(lambda: self.button_was_reset,
+                                           timeout=60.0 * self.keep_nodes_time)
+                if not detected:
+                    self.notify('Timeout. Start shutdown', True, self.keep_nodes_time)
 
             else:
                 self.notify('Failed to launch. Retrying..', True)
 
             self.term_nodes(is_all)
 
-            # If you re -set up before the node falls, you will get an error such as parameter duplication, so wait.
+            # Wait because if restarted before the node falls, errors such as parameter duplication occur
             is_down = self.wait_until(lambda: CHECK_NODE.intersection(self.node.get_node_names()) == set(),
                                       timeout=60.0,
                                       polling=0.5)
@@ -282,7 +281,7 @@ class RobotService:
 
 
 class HsrbRobotService(RobotService):
-    u"""HSRB automatic start -up control class"""
+    u"""HSRB auto-start control class"""
 
     def __init__(self, watch_motor_id=11, watch_timeout=15, keep_nodes_time=10, lang='ja'):
         super(HsrbRobotService, self).__init__(watch_motor_id=watch_motor_id,
@@ -297,7 +296,7 @@ class HsrbRobotService(RobotService):
 
 
 class HsrcRobotService(RobotService):
-    u"""HSRC automatic start -up control class"""
+    u"""HSRC auto-start control class"""
 
     def __init__(self, watch_motor_id=11, watch_timeout=15, keep_nodes_time=10, lang='ja'):
         super(HsrcRobotService, self).__init__(watch_motor_id=watch_motor_id,

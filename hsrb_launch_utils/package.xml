@@ -1,13 +1,13 @@
 <package format="3">
   <name>hsrb_launch_utils</name>
-  <version>2.0.0</version>
-  <description> Utility functions for hsrb_launch </description>
+  <version>2.1.0</version>
+  <description>utils related to launch files for hsrb_launch</description>
 
   <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
 
   <license>BSD 3-clause Clear License</license>
 
-  <author>Hiroaki Yaguchi</author>
+  <author>Tamaki Nishino</author>
 
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ros2launch</exec_depend>

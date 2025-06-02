@@ -1,0 +1,27 @@
+<package format="3">
+  <name>hsrb_common_launch</name>
+  <version>2.1.0</version>
+  <description>Common launch files for HSRB</description>
+
+  <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
+
+  <license>BSD 3-clause Clear License</license>
+
+  <author>Tamaki Nishino</author>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>hsrb_description</exec_depend>
+  <exec_depend>hsrb_joystick_teleop</exec_depend>
+  <exec_depend>hsrb_manipulation_launch</exec_depend>
+  <exec_depend>hsrb_pseudo_endeffector_controller</exec_depend>
+  <exec_depend>hsrb_rosnav_config</exec_depend>
+  <exec_depend>joy_linux</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>tmc_collision_environment</exec_depend>
+  <exec_depend>tmc_pseudo_velocity_controller</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

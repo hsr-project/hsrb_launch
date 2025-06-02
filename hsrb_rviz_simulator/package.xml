@@ -1,0 +1,30 @@
+<package format="3">
+  <name>hsrb_rviz_simulator</name>
+  <version>2.1.0</version>
+  <description>Launch files and basic configurations for HSR-B kinematic simulation.</description>
+  <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
+  <license>BSD 3-clause Clear License</license>
+  <author>Koji Terada</author>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>hsrb_base_controllers</exec_depend>
+  <exec_depend>hsrb_common_launch</exec_depend>
+  <exec_depend>hsrb_description</exec_depend>
+  <exec_depend>hsrb_gripper_controller</exec_depend>
+  <exec_depend>hsrb_gripper_fake_interface</exec_depend>
+  <exec_depend>hsrc_description</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tmc_launch_ros_utils</exec_depend>
+  <exec_depend>tmc_potential_maps</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
