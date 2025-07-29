@@ -153,7 +153,7 @@ def generate_launch_description():
                                                        'maps', 'white_space', 'map.yaml'])}.items(),
         condition=IfCondition(LaunchConfiguration('use_navigation')))
 
-    # If the scan topic is not present, it will not work with rosnav.
+    # If the scan topic is not published, rosnav will not work.
     dummy_scan_publisher = ExecuteProcess(cmd=['ros2', 'topic', 'pub', '/scan', 'sensor_msgs/msg/LaserScan',
                                                '{header: {stamp: now, frame_id: base_range_sensor_link}}'],
                                           condition=IfCondition(LaunchConfiguration('use_navigation')))

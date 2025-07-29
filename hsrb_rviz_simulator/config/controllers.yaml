@@ -56,6 +56,9 @@ gripper_controller:
     distance_control_dgain: 2.5
     distance_goal_tolerance: 0.003
     force_goal_tolerance: 10000.0
+    force_control_pgain: 0.3
+    force_control_igain: 0.05
+    force_control_dgain: 0.4
 
 omni_base_controller:
   ros__parameters:

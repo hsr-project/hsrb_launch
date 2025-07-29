@@ -51,14 +51,15 @@ def generate_launch_description():
 
     tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
 
-    # Fixed elements of launch_arguments are defined here.
+    # The fixed items for launch_arguments are defined here.
     launch_arg_info = {
         "map": os.path.join(
             get_package_share_directory('tmc_potential_maps'),
             'maps/mega-web/map.yaml'),
-        "robot_pos": "-1.0,-7.5,0.32,1.57",
-        "ground_truth_xyz": "1.0\\ 7.5\\ -0.304866",
-        "ground_truth_rpy": "0.0\\ 0.0\\ -1.57",
+        "robot_pos_x": "-1.0",
+        "robot_pos_y": "-7.5",
+        "robot_pos_z": "0.32",
+        "robot_rpy_Y": "1.57"
     }
 
     hsrb_gazebo_common = IncludeLaunchDescription(

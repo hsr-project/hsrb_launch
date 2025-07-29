@@ -2,6 +2,12 @@
 Changelog for package hsrb_gazebo_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.0 (2025-07-29)
+-------------------
+* simulator support for apply_force
+* Change for Ignition Gazebo
+* Contributors: Katsushi Fukuoka, Shigeo Tsuduki
+
 2.1.0 (2025-04-22)
 -------------------
 * Add a launch file for simultaneous node startup and fix the remap settings for the odom topic
