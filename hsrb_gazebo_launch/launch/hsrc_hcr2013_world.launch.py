@@ -42,6 +42,9 @@ def generate_launch_description():
                 'launch/hsrb_hcr2013_world.launch.py')),
         launch_arguments={
             "robot_name": "hsrc",
+            "description_package": "hsrc_description",
+            "description_file": "hsrc1s.urdf.xacro",
+            "collision_file": "collision_pair_hsrc.xml"
         }.items())
 
     return LaunchDescription([

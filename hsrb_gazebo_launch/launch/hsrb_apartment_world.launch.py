@@ -51,14 +51,16 @@ def generate_launch_description():
 
     tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
 
-    # Fixed items of launch_arguments are defined here.
+    # Fixed launch_arguments are defined here.
     launch_arg_info = {
         "map": os.path.join(
             get_package_share_directory('tmc_potential_maps'),
             'maps/apartment/map.yaml'),
-        "robot_pos": "5.0,6.6,0.0,0.0",
-        "ground_truth_xyz": "-5.0\\ -6.6\\ 0.0",
-        "ground_truth_rpy": "0.0\\ 0.0\\ 0.0"}
+        "robot_pos_x": "5.0",
+        "robot_pos_y": "6.6",
+        "robot_pos_z": "0.0",
+        "robot_rpy_Y": "0.0"
+    }
 
     hsrb_gazebo_common = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(hsrb_gazebo_common_path),
