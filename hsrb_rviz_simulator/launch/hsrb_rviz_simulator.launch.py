@@ -43,13 +43,11 @@ from launch.substitutions import (
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+from tmc_launch_ros_utils.ros2_control import (
+    create_spawner_node,
+    set_on_process_exit_event_handler,
+)
 from tmc_launch_ros_utils.tmc_launch_ros_utils import load_robot_description
-
-
-def create_spanwer_node(controller_name, manager_name='/controller_manager'):
-    return Node(package='controller_manager',
-                executable='spawner',
-                arguments=[controller_name, '--controller-manager', manager_name])
 
 
 def declare_arguments():
@@ -60,8 +58,12 @@ def declare_arguments():
                                                     description='URDF/XACRO description file with the robot.'))
     declared_arguments.append(DeclareLaunchArgument('runtime_config_package', default_value='hsrb_rviz_simulator',
                                                     description='Package with the controller\'s configuration.'))
-    declared_arguments.append(DeclareLaunchArgument('controllers_file', default_value='controllers.yaml',
-                                                    description='YAML file with the controllers configuration.'))
+    declared_arguments.append(DeclareLaunchArgument('common_controllers_file', default_value='controllers.yaml',
+                                                    description='YAML file with the common controllers configuration.'))
+    declared_arguments.append(DeclareLaunchArgument('robot_specific_controllers_file',
+                                                    default_value='controllers_hsrb.yaml',
+                                                    description='YAML file with the robot specific controllers '
+                                                                'configuration.'))
 
     declared_arguments.append(DeclareLaunchArgument('common_launch_package',
                                                     default_value='hsrb_common_launch',
@@ -89,13 +91,17 @@ def generate_launch_description():
     robot_description = load_robot_description(xacro_arg='rviz_sim:=True')
 
     runtime_config_package = LaunchConfiguration('runtime_config_package')
-    controllers_file = LaunchConfiguration('controllers_file')
+    common_controllers_file = LaunchConfiguration('common_controllers_file')
     robot_controllers = PathJoinSubstitution(
-        [FindPackageShare(runtime_config_package), 'config', controllers_file])
+        [FindPackageShare(runtime_config_package), 'config', common_controllers_file])
+
+    robot_specific_controllers_file = LaunchConfiguration('robot_specific_controllers_file')
+    robot_specific_controllers = PathJoinSubstitution(
+        [FindPackageShare(runtime_config_package), 'config', robot_specific_controllers_file])
 
     control_node = Node(package='controller_manager',
                         executable='ros2_control_node',
-                        parameters=[robot_description, robot_controllers],
+                        parameters=[robot_description, robot_controllers, robot_specific_controllers],
                         remappings=[('odom', '~/wheel_odom')])
 
     joint_state_publisher = Node(package='joint_state_publisher',
@@ -158,15 +164,19 @@ def generate_launch_description():
                                                '{header: {stamp: now, frame_id: base_range_sensor_link}}'],
                                           condition=IfCondition(LaunchConfiguration('use_navigation')))
 
+    motion_command_limitter_controller_spawner = create_spawner_node('motion_command_limitter_controller')
+    omni_base_controller_spawner = create_spawner_node('omni_base_controller')
     nodes = [control_node,
              joint_state_publisher,
              robot_state_pub_node,
              wheel_odom_connector_tf,
-             create_spanwer_node('joint_state_broadcaster'),
-             create_spanwer_node('head_trajectory_controller'),
-             create_spanwer_node('arm_trajectory_controller'),
-             create_spanwer_node('gripper_controller'),
-             create_spanwer_node('omni_base_controller'),
+             create_spawner_node('joint_state_broadcaster'),
+             create_spawner_node('head_trajectory_controller'),
+             create_spawner_node('arm_trajectory_controller'),
+             create_spawner_node('gripper_controller'),
+             motion_command_limitter_controller_spawner,
+             set_on_process_exit_event_handler(motion_command_limitter_controller_spawner.actions[0],
+                                               omni_base_controller_spawner.actions),
              rviz_node,
              hsrb_teleop,
              hsrb_manipulation,

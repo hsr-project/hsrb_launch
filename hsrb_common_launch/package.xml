@@ -1,6 +1,6 @@
 <package format="3">
   <name>hsrb_common_launch</name>
-  <version>2.2.0</version>
+  <version>2.3.0</version>
   <description>Common launch files for HSRB</description>
 
   <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
@@ -14,12 +14,26 @@
   <exec_depend>hsrb_joystick_teleop</exec_depend>
   <exec_depend>hsrb_manipulation_launch</exec_depend>
   <exec_depend>hsrb_pseudo_endeffector_controller</exec_depend>
-  <exec_depend>hsrb_rosnav_config</exec_depend>
   <exec_depend>joy_linux</exec_depend>
   <exec_depend>launch_ros</exec_depend>
+  <exec_depend>pointcloud_to_laserscan</exec_depend>
   <exec_depend>ros2launch</exec_depend>
+  <exec_depend>tmc_base_path_follower</exec_depend>
+  <exec_depend>tmc_base_path_planner</exec_depend>
   <exec_depend>tmc_collision_environment</exec_depend>
+  <exec_depend>tmc_grid_map_server</exec_depend>
+  <exec_depend>tmc_laser_2d_localizer</exec_depend>
+  <exec_depend>tmc_launch_ros_utils</exec_depend>
+  <exec_depend>tmc_map_merger</exec_depend>
+  <exec_depend>tmc_marker_based_localizer</exec_depend>
+  <exec_depend>tmc_move_base</exec_depend>
+  <exec_depend>tmc_point_cloud_merger</exec_depend>
+  <exec_depend>tmc_pose_integrator</exec_depend>
+  <exec_depend>tmc_potential_maps</exec_depend>
   <exec_depend>tmc_pseudo_velocity_controller</exec_depend>
+  <exec_depend>tmc_safety_velocity_limiter</exec_depend>
+  <exec_depend>tmc_velocity_switcher</exec_depend>
+  <exec_depend>tmc_viewpoint_controller</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

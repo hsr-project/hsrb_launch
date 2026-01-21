@@ -1,0 +1,17 @@
+marker_based_localizer:
+  ros__parameters:
+    travel_distance_threshold: 0.0
+    marker_to_base_distance_threshold: 1.8
+    joint_stopping_vel: 0.005
+    joints_list: ['base_l_drive_wheel_joint',
+                  'base_r_drive_wheel_joint',
+                  'base_roll_joint',
+                  'head_pan_joint',
+                  'head_tilt_joint',
+                  'arm_lift_joint']
+    # マーカで自己位置補正したい場合は下記のようにmarker_objectを登録すること
+    # marker_objects:
+    #   object_1:
+    #     object_id: 507
+    #     translation: [0.6, 0.0, 0.0]
+    #     rotation: [-0.5, 0.5, -0.5, 0.5]
