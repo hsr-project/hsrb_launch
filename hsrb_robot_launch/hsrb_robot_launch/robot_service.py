@@ -159,7 +159,7 @@ class RobotService:
             self.kill_process(self.proc_device)
             self.proc_device = None
 
-    def launch_nodes(self, all_nodes=True, timeout=15.0):
+    def launch_nodes(self, all_nodes=True, timeout=20.0):
         u"""Start nodes"""
         self.node.get_logger().info("Start launching")
         # Start non-device-related nodes

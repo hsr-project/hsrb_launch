@@ -32,12 +32,14 @@ package_name = 'hsrb_common_launch'
 
 setup(
     name=package_name,
-    version='2.2.0',
+    version='2.3.0',
     packages=[],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'config'), glob.glob(os.path.join('config', '*.yaml'))),
+        (os.path.join('share', package_name, 'config/navigation'),
+         glob.glob(os.path.join('config/navigation', '*.yaml'))),
         (os.path.join('share', package_name, 'launch'), glob.glob(os.path.join('launch', '*.py'))),
     ],
     install_requires=['setuptools'],

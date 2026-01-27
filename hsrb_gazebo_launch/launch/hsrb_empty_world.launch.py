@@ -51,7 +51,7 @@ def generate_launch_description():
 
     tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
 
-    # The static elements of launch_arguments are defined here.
+    # Fixed elements of launch_arguments are defined here.
     launch_arg_info = {
         "map": os.path.join(
             get_package_share_directory('tmc_potential_maps'),

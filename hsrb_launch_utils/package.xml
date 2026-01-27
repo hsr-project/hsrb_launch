@@ -1,7 +1,7 @@
 <package format="3">
   <name>hsrb_launch_utils</name>
-  <version>2.2.0</version>
-  <description>Utilities related to the launch files of hsrb_launch</description>
+  <version>2.3.0</version>
+  <description>Utils related to the launch files of hsrb_launch</description>
 
   <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
 

@@ -26,12 +26,8 @@
 # DAMAGE.
 from launch import LaunchDescription
 
-from launch.actions import (
-    DeclareLaunchArgument,
-    IncludeLaunchDescription,
-)
+from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
@@ -72,6 +68,8 @@ def declare_arguments():
     declared_arguments.append(DeclareLaunchArgument('odom_topic',
                               default_value='omni_base_controller/wheel_odom',
                               description='Odometry topic name'))
+    declared_arguments.append(DeclareLaunchArgument('hand_close_force',
+                              default_value='0.8'))
 
     return declared_arguments
 
@@ -84,10 +82,15 @@ def generate_launch_description():
                     output='screen',
                     condition=IfCondition(LaunchConfiguration('use_joy_node')))
 
-    joystick_teleop_launch = PathJoinSubstitution(
-        [FindPackageShare('hsrb_joystick_teleop'), 'launch', 'hsrb_joystick_control.launch.py'])
-    joystick_teleop_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(joystick_teleop_launch))
+    joystick_teleop_config = PathJoinSubstitution(
+        [FindPackageShare('hsrb_common_launch'), 'config', 'joystick_control_config.yaml'])
+    joystick_teleop_node = Node(package='hsrb_joystick_teleop',
+                                executable='joystick_control_node',
+                                output='screen',
+                                emulate_tty=True,
+                                remappings=[('command_velocity', 'command_velocity_teleop')],
+                                parameters=[joystick_teleop_config,
+                                            {'hand_close_force': LaunchConfiguration('hand_close_force')}])
 
     runtime_config_package = LaunchConfiguration('teleop_runtime_config_package')
     pseudo_ee_controller_config = PathJoinSubstitution(

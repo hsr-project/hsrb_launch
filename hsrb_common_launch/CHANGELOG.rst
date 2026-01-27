@@ -2,6 +2,15 @@
 Changelog for package hsrb_common_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2025-12-04)
+-------------------
+* Fix copyright description.
+* Use tmc_navigation for humble.
+* Change command_velocity topic name remap to command_velocity_teleop.
+* Change environment variable name  MAP to MAP_PATH.
+* Fix to use robot-specific base controller parameters.
+* Contributors: Keisuke Takeshita, 柴宮 和希
+
 2.2.0 (2025-07-29)
 -------------------
 * マージ先 ros2/feature/simulator-support-for-apply-force

@@ -37,4 +37,5 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/hsrb_rviz_simulator.launch.py']),
             launch_arguments={'description_package': 'hsrc_description',
                               'description_file': 'hsrc1s.urdf.xacro',
+                              'robot_specific_controllers_file': 'controllers_hsrc.yaml',
                               'manipulation_launch': 'hsrc_manipulation.py'}.items())])

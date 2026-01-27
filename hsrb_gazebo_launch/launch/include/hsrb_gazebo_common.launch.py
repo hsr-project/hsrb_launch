@@ -32,7 +32,7 @@ from launch.actions import (
     IncludeLaunchDescription,
     OpaqueFunction
 )
-from launch.conditions import IfCondition, UnlessCondition
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     LaunchConfiguration
@@ -58,8 +58,8 @@ def launch_setup(context,
     # rviz_node
     if use_navigation_value == "true":
         rviz_config = os.path.join(
-            get_package_share_directory('hsrb_rosnav_config'),
-            'rviz/hsr_navigation2.rviz')
+            get_package_share_directory('hsrb_gazebo_launch'),
+            'config/display_full_config.rviz')
     else:
         rviz_config = os.path.join(
             get_package_share_directory('hsrb_gazebo_launch'),
@@ -75,7 +75,7 @@ def launch_setup(context,
                      parameters=[robot_description, {'use_sim_time': True}],
                      condition=IfCondition(LaunchConfiguration('rviz')))
 
-    # Activate the navigation node
+    # Launch the navigation node.
     hsrb_common_launch_dir = get_package_share_directory('hsrb_common_launch')
 
     hsrb_navigation_launch = os.path.join(hsrb_common_launch_dir, 'launch', 'navigation.py')
@@ -85,21 +85,6 @@ def launch_setup(context,
                           'map': LaunchConfiguration('map'),
                           'odom_topic': 'odom'}.items(),
         condition=IfCondition(LaunchConfiguration('use_navigation')))
-
-    tmc_grid_map_server = Node(package='tmc_grid_map_server',
-                               executable='grid_map_server',
-                               name='grid_map_server',
-                               output='screen',
-                               parameters=[{"map_yaml_path": LaunchConfiguration('map')},
-                                           {'use_sim_time': True}],
-                               condition=UnlessCondition(LaunchConfiguration('use_navigation')))
-
-    tmc_grid_map_server_tf = Node(package='tf2_ros',
-                                  executable='static_transform_publisher',
-                                  name='static_transform_publisher',
-                                  output='log',
-                                  arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'odom', 'map'],
-                                  condition=UnlessCondition(LaunchConfiguration('use_navigation')))
 
     # manipulation
     hsrb_manipulation_launch = os.path.join(hsrb_common_launch_dir, 'launch', f'{robot_name_value}_manipulation.py')
@@ -122,8 +107,6 @@ def launch_setup(context,
 
     nodes = [rviz_node,
              hsrb_navigation,
-             tmc_grid_map_server,
-             tmc_grid_map_server_tf,
              hsrb_manipulation,
              hsrb_teleop,
              gazebo_bringup_launch]

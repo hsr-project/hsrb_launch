@@ -31,7 +31,7 @@ package_name = 'hsrb_launch_utils'
 
 setup(
     name=package_name,
-    version='2.2.0',
+    version='2.3.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -42,7 +42,7 @@ setup(
     zip_safe=True,
     maintainer='HSR Support',
     maintainer_email='xr-hsr-support@mail.toyota.co.jp',
-    description='Utils related to launch files in hsrb_launch',
+    description='Utils related to the launch files of hsrb_launch',
     license='BSD 3-clause Clear License',
     tests_require=['pytest'],
 )
