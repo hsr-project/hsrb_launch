@@ -66,7 +66,7 @@ def declare_arguments():
     default_map = get_package_share_directory('tmc_potential_maps') + '/maps/white_space/map.yaml'
     declared_arguments.append(
         DeclareLaunchArgument('map',
-                              default_value=os.environ.get('MAP', default_map),
+                              default_value=os.environ.get('MAP_PATH', default_map),
                               description='Map yaml file'))
 
     return declared_arguments
