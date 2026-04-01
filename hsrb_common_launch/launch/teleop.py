@@ -24,13 +24,18 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 # DAMAGE.
+
+import os
+
 from launch import LaunchDescription
 
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.substitutions import (
+    IfElseSubstitution,
     LaunchConfiguration,
     PathJoinSubstitution,
+    TextSubstitution
 )
 
 from launch_ros.actions import (
@@ -70,6 +75,9 @@ def declare_arguments():
                               description='Odometry topic name'))
     declared_arguments.append(DeclareLaunchArgument('hand_close_force',
                               default_value='0.8'))
+    declared_arguments.append(DeclareLaunchArgument('use_navigation',
+                              default_value=os.environ.get('USE_NAVIGATION', 'true'),
+                              description='Use navigation if true'))
 
     return declared_arguments
 
@@ -84,11 +92,15 @@ def generate_launch_description():
 
     joystick_teleop_config = PathJoinSubstitution(
         [FindPackageShare('hsrb_common_launch'), 'config', 'joystick_control_config.yaml'])
+    remap_topic_name = IfElseSubstitution(
+        LaunchConfiguration('use_navigation'),
+        TextSubstitution(text='command_velocity_teleop'),
+        TextSubstitution(text='/omni_base_controller/cmd_vel'))
     joystick_teleop_node = Node(package='hsrb_joystick_teleop',
                                 executable='joystick_control_node',
                                 output='screen',
                                 emulate_tty=True,
-                                remappings=[('command_velocity', 'command_velocity_teleop')],
+                                remappings=[('command_velocity', remap_topic_name)],
                                 parameters=[joystick_teleop_config,
                                             {'hand_close_force': LaunchConfiguration('hand_close_force')}])
 
