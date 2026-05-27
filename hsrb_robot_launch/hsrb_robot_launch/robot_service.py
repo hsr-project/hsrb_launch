@@ -81,12 +81,12 @@ class RobotService:
         self.keep_nodes_time = keep_nodes_time
         self.lang = lang
         personal_name = os.getenv("PERSONAL_NAME", "HSR")
-        MESSAGES['HSR start']['ja'][0] = personal_name + u" Start"
+        MESSAGES['HSR start']['ja'][0] = personal_name + u"スタート"
         MESSAGES['HSR start']['en'][0] = personal_name + u" start"
 
         if personal_name != "HSR":
             # Intentionally inserting commas to create pauses in speech
-            MESSAGES['HSR stopped']['ja'][0] = personal_name + u", Stopped"
+            MESSAGES['HSR stopped']['ja'][0] = personal_name + u",停止しました"
         MESSAGES['HSR stopped']['en'][0] = personal_name + u" stopped"
 
         self.was_emergency_on = False
