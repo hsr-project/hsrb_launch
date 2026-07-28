@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2025 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -143,7 +143,7 @@ def generate_launch_description():
         parameters=[{'map_yaml_path': LaunchConfiguration('map')}],
     )
     # map_merger
-    # When use_rear_scan=false
+    # In case use_rear_scan=false
     map_merger_launch_for_robot_no_rear = Node(
         package='tmc_map_merger',
         executable='map_merger',
@@ -154,7 +154,7 @@ def generate_launch_description():
                     {'origin_frame': LaunchConfiguration('robot_tf_name')}],
         condition=UnlessCondition(LaunchConfiguration('use_rear_scan'))
     )
-    # When use_rear_scan=true
+    # In case use_rear_scan=true
     map_merger_launch_for_sim_use_rear = Node(
         package='tmc_map_merger',
         executable='map_merger',
@@ -219,7 +219,7 @@ def generate_launch_description():
         parameters=[viewpoint_controller_params_file],
     )
     # safety_velocity_limiter
-    # When there is no rear
+    # In case without rear
     safety_velocity_limiter_launch = Node(
         package='tmc_safety_velocity_limiter',
         executable='safety_velocity_limiter',
@@ -232,7 +232,7 @@ def generate_launch_description():
                     {'enable_function': False}],
         condition=UnlessCondition(LaunchConfiguration('use_rear_scan'))
     )
-    # When there is a rear
+    # In case with rear
     safety_velocity_limiter_rear_launch = Node(
         package='tmc_safety_velocity_limiter',
         executable='safety_velocity_limiter',

@@ -27,57 +27,25 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-from hsrb_launch_utils.hsrb_launch_utils import declare_launch_arguments
 from launch import (
     LaunchDescription
 )
-from launch.actions import (
-    IncludeLaunchDescription
-)
-from launch.conditions import IfCondition, UnlessCondition
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (
-    LaunchConfiguration
-)
 
 
 def generate_launch_description():
-    declared_arguments = declare_launch_arguments()
-    condition = LaunchConfiguration('fast_physics')
+    hsrc_gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('hsrb_gazebo_launch'),
+                'launch/hsrb_aws_robomaker_small_house_world.launch.py')),
+        launch_arguments={
+            "robot_name": "hsrc",
+            "description_package": "hsrc_description",
+            "description_file": "hsrc1s.urdf.xacro",
+            "collision_file": "collision_pair_hsrc.xml"
+        }.items())
 
-    hsrb_gazebo_common_path = os.path.join(
-        get_package_share_directory('hsrb_gazebo_launch'),
-        'launch/include/hsrb_gazebo_common.launch.py')
-
-    tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
-
-    # Fixed launch arguments are defined here.
-    launch_arg_info = {
-        "map": os.path.join(
-            get_package_share_directory('tmc_potential_maps'),
-            'maps/hcr2013/map.yaml'),
-        "robot_pos_x": "0.0",
-        "robot_pos_y": "0.0",
-        "robot_pos_z": "0.0",
-        "robot_rpy_Y": "0.0"
-    }
-
-    hsrb_gazebo_common = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_gazebo_common_path),
-        launch_arguments={**launch_arg_info,
-                          **{"world_name": os.path.join(tmc_gazebo_worlds_dir,
-                                                        'worlds/hcr2013.world')}
-                          }.items(),
-        condition=UnlessCondition(condition))
-
-    hsrb_gazebo_common_fast = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_gazebo_common_path),
-        launch_arguments={**launch_arg_info,
-                          **{"world_name": os.path.join(tmc_gazebo_worlds_dir,
-                                                        'worlds/hcr2013_fast.world')}
-                          }.items(),
-        condition=IfCondition(condition))
-
-    return LaunchDescription(declared_arguments + [
-        hsrb_gazebo_common,
-        hsrb_gazebo_common_fast])
+    return LaunchDescription([
+        hsrc_gazebo_launch])

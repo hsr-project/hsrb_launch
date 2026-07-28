@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -51,7 +51,7 @@ def generate_launch_description():
 
     tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
 
-    # Fixed launch_arguments are defined here.
+    # Fixed launch arguments are defined here.
     launch_arg_info = {
         "map": os.path.join(
             get_package_share_directory('tmc_potential_maps'),

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -24,9 +24,9 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 # DAMAGE.
-"""Launch file for experimental batch startup
+"""Launch file for batch startup for experiments
 
-* Launches necessary ecu nodes, talk_hoya nodes, etc., and starts robot_service together
+* Starts necessary ECU-related nodes, talk_hoya node, etc., and robot_service together
 * ROS2 can be launched from the command using ros2 launch hsrb_robot_launch hsrb_service_all.launch.py
 
 """

@@ -54,4 +54,4 @@
       - 0.6
       - 0.2
       - 0.5
-    wait_for_controller_milliseconds: 10000
+    wait_for_controller_milliseconds: 20000

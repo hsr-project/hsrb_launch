@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -47,69 +47,118 @@ def launch_setup(context,
     robot_name_value = context.perform_substitution(robot_name)
     use_navigation_value = context.perform_substitution(use_navigation)
 
-    hsrb_gazebo_bringup_launch = os.path.join(
-        get_package_share_directory('hsrb_gazebo_bringup'),
-        'launch',
-        f'{robot_name_value}_gazebo_bringup.launch.py')
+    robot_description = load_robot_description(
+        sim_condition='False',
+        xacro_arg='ignition_gazebo_sim:=False'
+    )
+
+    # gazebo_bringup
     gazebo_bringup_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_gazebo_bringup_launch),
-        launch_arguments={'world_file_name': LaunchConfiguration('world_name')}.items())
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('hsrb_gazebo_bringup'),
+                'launch',
+                f'{robot_name_value}_gazebo_bringup.launch.py'
+            )
+        ),
+        launch_arguments={
+            'world_file_name': LaunchConfiguration('world_name'),
+        }.items(),
+    )
 
     # rviz_node
     if use_navigation_value == "true":
         rviz_config = os.path.join(
             get_package_share_directory('hsrb_gazebo_launch'),
-            'config/display_full_config.rviz')
+            'config',
+            'display_full_config.rviz'
+        )
     else:
         rviz_config = os.path.join(
             get_package_share_directory('hsrb_gazebo_launch'),
-            'config/display_config.rviz')
+            'config',
+            'display_config.rviz'
+        )
 
-    robot_description = load_robot_description()
-
-    rviz_node = Node(package='rviz2',
-                     executable='rviz2',
-                     name='rviz2',
-                     output='log',
-                     arguments=['-d', rviz_config],
-                     parameters=[robot_description, {'use_sim_time': True}],
-                     condition=IfCondition(LaunchConfiguration('rviz')))
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='log',
+        arguments=[
+            '-d',
+            rviz_config
+        ],
+        parameters=[
+            robot_description,
+            {
+                'use_sim_time': True
+            }
+        ],
+        condition=IfCondition(LaunchConfiguration('rviz'))
+    )
 
     # Launch the navigation node.
     hsrb_common_launch_dir = get_package_share_directory('hsrb_common_launch')
 
-    hsrb_navigation_launch = os.path.join(hsrb_common_launch_dir, 'launch', 'navigation.py')
     hsrb_navigation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_navigation_launch),
-        launch_arguments={'use_sim_time': 'true',
-                          'map': LaunchConfiguration('map'),
-                          'odom_topic': 'odom'}.items(),
-        condition=IfCondition(LaunchConfiguration('use_navigation')))
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                hsrb_common_launch_dir,
+                'launch',
+                'navigation.py'
+            )
+        ),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'map': LaunchConfiguration('map'),
+            'odom_topic': 'odom'
+        }.items(),
+        condition=IfCondition(LaunchConfiguration('use_navigation'))
+    )
 
     # manipulation
-    hsrb_manipulation_launch = os.path.join(hsrb_common_launch_dir, 'launch', f'{robot_name_value}_manipulation.py')
     hsrb_manipulation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_manipulation_launch),
-        launch_arguments={'use_sim_time': 'true'}.items(),
-        condition=IfCondition(LaunchConfiguration('use_manipulation')))
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                hsrb_common_launch_dir,
+                'launch',
+                f'{robot_name_value}_manipulation.py'
+            )
+        ),
+        launch_arguments={
+            'use_sim_time': 'true'
+        }.items(),
+        condition=IfCondition(LaunchConfiguration('use_manipulation'))
+    )
 
     # teleop
-    hsrb_teleop_launch = os.path.join(hsrb_common_launch_dir, 'launch', 'teleop.py')
     hsrb_teleop = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(hsrb_teleop_launch),
-        launch_arguments={'description_package': LaunchConfiguration('description_package'),
-                          'description_file': LaunchConfiguration('description_file'),
-                          'teleop_runtime_config_package': 'hsrb_common_launch',
-                          'use_joy_node': LaunchConfiguration('use_joy_node'),
-                          'use_sim_time': 'true',
-                          'hand_close_force': '0.08'}.items(),
-        condition=IfCondition(LaunchConfiguration('use_teleop')))
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                hsrb_common_launch_dir,
+                'launch',
+                'teleop.py'
+            )
+        ),
+        launch_arguments={
+            'description_package': LaunchConfiguration('description_package'),
+            'description_file': LaunchConfiguration('description_file'),
+            'teleop_runtime_config_package': 'hsrb_common_launch',
+            'use_joy_node': LaunchConfiguration('use_joy_node'),
+            'use_sim_time': 'true',
+            'hand_close_force': '0.08'
+        }.items(),
+        condition=IfCondition(LaunchConfiguration('use_teleop'))
+    )
 
-    nodes = [rviz_node,
-             hsrb_navigation,
-             hsrb_manipulation,
-             hsrb_teleop,
-             gazebo_bringup_launch]
+    nodes = [
+        rviz_node,
+        hsrb_navigation,
+        hsrb_manipulation,
+        hsrb_teleop,
+        gazebo_bringup_launch
+    ]
 
     return nodes
 
