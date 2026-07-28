@@ -2,6 +2,15 @@
 Changelog for package hsrb_robot_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2026-06-29)
+-------------------
+* Migration to ROS2 jazzy
+* Contributors: Katsushi Fukuoka, Shigeo Tsuduki, Keisuke Takeshita, Ryu Nishimori
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package hsrb_robot_launch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 2.1.0 (2025-04-22)
 -------------------
 * Add a launch file for simultaneous node startup and fix the remap settings for the odom topic

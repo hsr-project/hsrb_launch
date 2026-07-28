@@ -1,4 +1,4 @@
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -44,22 +44,22 @@ from .robot_service_utils import exxx_read_hash, RobotServiceDiagPublisher
 
 
 MESSAGES = {
-    'HSR start': {'ja': [u"HSRスタート", 3.0],
+    'HSR start': {'ja': [u"HSR start", 3.0],
                   'en': [u"HSR start", 2.0]},
-    'HSR stopped': {'ja': [u"停止しました", 3.0],
+    'HSR stopped': {'ja': [u"Stopped", 3.0],
                     'en': [u"HSR stopped", 1.0]},
-    'Killing all nodes': {'ja': (u"全てのノードを停止します", 4.0),
+    'Killing all nodes': {'ja': (u"Stopping all nodes", 4.0),
                           'en': (u"Killing all the nodes", 4.0)},
-    'Failed to launch. Retrying..': {'ja': (u"起動に失敗しました。再起動します", 5.0),
+    'Failed to launch. Retrying..': {'ja': (u"Failed to launch. Retrying..", 5.0),
                                      'en': (u'Failed to launch. Retrying', 4.0)},
-    'Timeout. Start shutdown': {'ja': (u"{0}分経過しました", 3.0),
+    'Timeout. Start shutdown': {'ja': (u"{0} minutes have passed", 3.0),
                                 'en': (u"{0} minutes passed", 3.0)},
 }
 
 """
-If this node is up, it can be assumed that other nodes are mostly up as well / if this node could be killed, others likely could too.
+If this node is up, it is likely that other nodes are also up, and if it can be killed, it is likely that others can be killed as well.
 Set of node names in use
-Basic ones are covered
+The basics are covered
 """
 CHECK_NODE = {"robot_state_publisher", "joint_state_publisher",
               "joint_state_broadcaster", "servo_diagnostic_broadcaster",
@@ -81,12 +81,12 @@ class RobotService:
         self.keep_nodes_time = keep_nodes_time
         self.lang = lang
         personal_name = os.getenv("PERSONAL_NAME", "HSR")
-        MESSAGES['HSR start']['ja'][0] = personal_name + u"スタート"
+        MESSAGES['HSR start']['ja'][0] = personal_name + u" start"
         MESSAGES['HSR start']['en'][0] = personal_name + u" start"
 
         if personal_name != "HSR":
-            # Intentionally inserting commas to create pauses in speech
-            MESSAGES['HSR stopped']['ja'][0] = personal_name + u",停止しました"
+            # A comma is intentionally added to create a pause in speech
+            MESSAGES['HSR stopped']['ja'][0] = personal_name + u", stopped"
         MESSAGES['HSR stopped']['en'][0] = personal_name + u" stopped"
 
         self.was_emergency_on = False
@@ -115,7 +115,7 @@ class RobotService:
 
         signal.signal(signal.SIGTERM, self.signal)
         signal.signal(signal.SIGINT, self.signal)
-        # Properly terminate child processes even when terminated by an internal error
+        # Ensure child processes are terminated properly even when exiting due to an internal error
         atexit.register(self.term_nodes)
 
     def make_subscriber(self):
@@ -125,7 +125,7 @@ class RobotService:
         u"""Signal handler"""
         self.running = False
         if sig != self.previous_signal:
-            # Ignore if the same signal is received multiple times during node shutdown
+            # Ignore if the same signal is received multiple times while stopping nodes
             self.previous_signal = sig
             self.term_nodes()
         rclpy.try_shutdown()
@@ -133,7 +133,7 @@ class RobotService:
         sys.exit(sig)
 
     def kill_process(self, proc):
-        u"""Terminate all processes including grandchild processes"""
+        u"""Terminate all processes, including subprocesses"""
         try:
             parent = psutil.Process(proc.pid)
         except psutil.NoSuchProcess:
@@ -143,13 +143,13 @@ class RobotService:
         # Terminate the target process
         proc.terminate()
         proc.wait()
-        # Terminate remaining child processes
+        # Terminate any remaining child processes
         for child in children:
             if child.is_running():
                 child.kill()
 
     def term_nodes(self, all_nodes=True):
-        u"""Stop nodes"""
+        u"""Stop the node"""
         if all_nodes:
             if self.proc_app:
                 self.notify('Killing all nodes', True)
@@ -159,8 +159,8 @@ class RobotService:
             self.kill_process(self.proc_device)
             self.proc_device = None
 
-    def launch_nodes(self, all_nodes=True, timeout=20.0):
-        u"""Start nodes"""
+    def launch_nodes(self, all_nodes=True, timeout=25.0):
+        u"""Start the node"""
         self.node.get_logger().info("Start launching")
         # Start non-device-related nodes
         if all_nodes:
@@ -198,9 +198,9 @@ class RobotService:
         return False
 
     def watch(self):
-        u"""Monitor until the emergency stop, which is issued at regular intervals, becomes ON.
+        u"""Monitor until the emergency stop, which is issued at regular intervals, is turned ON.
 
-        Exit when the issuing source is down and there is no communication for longer than the duration, or when it is no longer running.
+        Exit if the originator is down and there is no communication for longer than the duration, or if it is no longer running.
         """
         self.last_subscribed = self.node.get_clock().now()
         duration = rclpy.time.Duration(seconds=self.watch_timeout)
@@ -245,7 +245,7 @@ class RobotService:
             self.notify('HSR start', True)
             self.diag_pub.publish()
             success = self.launch_nodes(is_all)
-            # Set to True to restart all nodes when unintended behavior occurs
+            # Set to True to restart all nodes in case of unintended behavior
             # TODO(Takeshita) fast restartの実装がないので，結局常にtrue
             is_all = True
             if success:
@@ -263,7 +263,7 @@ class RobotService:
 
             self.term_nodes(is_all)
 
-            # Wait because if restarted before the node falls, errors such as parameter duplication occur
+            # Wait before restarting a node to avoid errors such as parameter duplication when the node is about to go down
             is_down = self.wait_until(lambda: CHECK_NODE.intersection(self.node.get_node_names()) == set(),
                                       timeout=60.0,
                                       polling=0.5)
@@ -281,7 +281,7 @@ class RobotService:
 
 
 class HsrbRobotService(RobotService):
-    u"""HSRB auto-start control class"""
+    u"""HSRB automatic startup control class"""
 
     def __init__(self, watch_motor_id=11, watch_timeout=15, keep_nodes_time=10, lang='ja'):
         super(HsrbRobotService, self).__init__(watch_motor_id=watch_motor_id,
@@ -296,7 +296,7 @@ class HsrbRobotService(RobotService):
 
 
 class HsrcRobotService(RobotService):
-    u"""HSRC auto-start control class"""
+    u"""HSRC automatic startup control class"""
 
     def __init__(self, watch_motor_id=11, watch_timeout=15, keep_nodes_time=10, lang='ja'):
         super(HsrcRobotService, self).__init__(watch_motor_id=watch_motor_id,

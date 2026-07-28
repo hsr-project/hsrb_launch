@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -47,15 +47,16 @@ def generate_launch_description():
 
     hsrb_gazebo_common_path = os.path.join(
         get_package_share_directory('hsrb_gazebo_launch'),
-        'launch/include/hsrb_gazebo_common.launch.py')
+        'launch',
+        'include',
+        'hsrb_gazebo_common.launch.py'
+    )
 
     tmc_gazebo_worlds_dir = get_package_share_directory('tmc_gazebo_worlds')
 
-    # Fixed elements of launch_arguments are defined here.
+    # Fixed launch arguments are defined here.
     launch_arg_info = {
-        "map": os.path.join(
-            get_package_share_directory('tmc_potential_maps'),
-            'maps/white_space/map.yaml'),
+        "map": os.path.join(get_package_share_directory('tmc_potential_maps'), 'maps', 'white_space', 'map.yaml'),
         "robot_pos_x": "0.0",
         "robot_pos_y": "0.0",
         "robot_pos_z": "0.0",
@@ -64,19 +65,25 @@ def generate_launch_description():
 
     hsrb_gazebo_common = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(hsrb_gazebo_common_path),
-        launch_arguments={**launch_arg_info,
-                          **{"world_name": os.path.join(tmc_gazebo_worlds_dir,
-                                                        'worlds/empty.world')}
-                          }.items(),
-        condition=UnlessCondition(condition))
+        launch_arguments={
+            **launch_arg_info,
+            **{
+                "world_name": os.path.join(tmc_gazebo_worlds_dir, 'worlds', 'empty.world')
+            }
+        }.items(),
+        condition=UnlessCondition(condition)
+    )
 
     hsrb_gazebo_common_fast = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(hsrb_gazebo_common_path),
-        launch_arguments={**launch_arg_info,
-                          **{"world_name": os.path.join(tmc_gazebo_worlds_dir,
-                                                        'worlds/empty_fast.world')}
-                          }.items(),
-        condition=IfCondition(condition))
+        launch_arguments={
+            **launch_arg_info,
+            **{
+                "world_name": os.path.join(tmc_gazebo_worlds_dir, 'worlds', 'empty.world')
+            }
+        }.items(),
+        condition=IfCondition(condition)
+    )
 
     return LaunchDescription(declared_arguments + [
         hsrb_gazebo_common,

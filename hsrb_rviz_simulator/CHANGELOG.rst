@@ -2,6 +2,15 @@
 Changelog for package hsrb_rviz_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2026-06-29)
+-------------------
+* Migration to ROS2 jazzy
+* Contributors: Katsushi Fukuoka, Shigeo Tsuduki, Keisuke Takeshita, Ryu Nishimori
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package hsrb_rviz_simulator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 2.3.0 (2025-12-04)
 -------------------
 * Fix copyright description.

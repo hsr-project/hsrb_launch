@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -38,7 +38,7 @@ MOTOR_IDS = [11, 12, 13, 21, 22, 23, 24, 25, 31, 32, 41]
 def exxx_read_hash(motor_id):
     u"""Wrapper for exxx_read_hash
 
-    Returns a dict as follows when communication is successful
+    Returns a dict as shown below if communication is successful
     {'firmware_hash': '0bd8ae8035a365c72dddf85e712117156c824372',
      'control_table_hash': '6fe89466421b08f50b5bb06e59f1fb09'}
     Returns None if it fails
@@ -83,7 +83,7 @@ def exxx_read_data_table(param, motor_id):
 
 
 class RobotServiceDiagPublisher(object):
-    u"""Diag class for robot_service"""
+    u"""Diagnostic class for robot_service"""
 
     def __init__(self, node):
         self._node = node
@@ -91,7 +91,7 @@ class RobotServiceDiagPublisher(object):
             DiagnosticArray, 'diagnostics', 10)
 
     def _get_lsusb_diag(self):
-        u"""Convert the result of lsusb to DiagnosticStatus"""
+        u"""Converts the result of lsusb into DiagnosticStatus"""
         status = DiagnosticStatus()
         status.name = "hsrb_robot_service: lsusb"
         status.hardware_id = 'USB'
@@ -111,7 +111,7 @@ class RobotServiceDiagPublisher(object):
         return status
 
     def _get_motor_status_diag(self, param):
-        u"""Read the param for the specified axis and convert to DiagnosticStatus"""
+        u"""Reads the params for the specified axis and converts them into DiagnosticStatus"""
         status = DiagnosticStatus()
         status.name = "hsrb_robot_service: {0}".format(param)
         status.level = DiagnosticStatus.OK
@@ -132,7 +132,7 @@ class RobotServiceDiagPublisher(object):
         return self._diag_pub.get_subscription_count()
 
     def publish(self):
-        u"""Acquire and issue necessary logs before startup
+        u"""Takes and issues the necessary logs before startup
 
         1. lsusb
         2. present_log_power_cycle

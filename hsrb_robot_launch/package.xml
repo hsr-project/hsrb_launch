@@ -1,6 +1,6 @@
 <package format="3">
   <name>hsrb_robot_launch</name>
-  <version>2.1.0</version>
+  <version>3.0.0</version>
   <description>Launch files and scripts for HSRB</description>
   <maintainer email="xr-hsr-support@mail.toyota.co.jp">HSR Support</maintainer>
 

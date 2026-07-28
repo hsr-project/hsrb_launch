@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2025 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -57,7 +57,7 @@ def declare_arguments():
     declared_arguments.append(DeclareLaunchArgument('description_file', default_value='hsrb4s.urdf.xacro',
                                                     description='URDF/XACRO description file with the robot.'))
     declared_arguments.append(DeclareLaunchArgument('runtime_config_package', default_value='hsrb_rviz_simulator',
-                                                    description='Package with the controller\'s configuration.'))
+                                                    description="Package with the controller\'s configuration."))
     declared_arguments.append(DeclareLaunchArgument('common_controllers_file', default_value='controllers.yaml',
                                                     description='YAML file with the common controllers configuration.'))
     declared_arguments.append(DeclareLaunchArgument('robot_specific_controllers_file',
@@ -159,12 +159,12 @@ def generate_launch_description():
                                                        'maps', 'white_space', 'map.yaml'])}.items(),
         condition=IfCondition(LaunchConfiguration('use_navigation')))
 
-    # If the scan topic is not published, rosnav will not work.
+    # If the scan topic is not published, rosnav will not function.
     dummy_scan_publisher = ExecuteProcess(cmd=['ros2', 'topic', 'pub', '/scan', 'sensor_msgs/msg/LaserScan',
                                                '{header: {stamp: now, frame_id: base_range_sensor_link}}'],
                                           condition=IfCondition(LaunchConfiguration('use_navigation')))
 
-    motion_command_limitter_controller_spawner = create_spawner_node('motion_command_limitter_controller')
+    motion_command_limiter_controller_spawner = create_spawner_node('motion_command_limiter_controller')
     omni_base_controller_spawner = create_spawner_node('omni_base_controller')
     nodes = [control_node,
              joint_state_publisher,
@@ -174,8 +174,8 @@ def generate_launch_description():
              create_spawner_node('head_trajectory_controller'),
              create_spawner_node('arm_trajectory_controller'),
              create_spawner_node('gripper_controller'),
-             motion_command_limitter_controller_spawner,
-             set_on_process_exit_event_handler(motion_command_limitter_controller_spawner.actions[0],
+             motion_command_limiter_controller_spawner,
+             set_on_process_exit_event_handler(motion_command_limiter_controller_spawner.actions[0],
                                                omni_base_controller_spawner.actions),
              rviz_node,
              hsrb_teleop,

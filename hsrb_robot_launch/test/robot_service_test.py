@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2024 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2026 TOYOTA MOTOR CORPORATION
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -26,46 +26,46 @@
 # DAMAGE.
 # -*- coding: utf-8 -*-
 u"""
-Test Item:
+Test items:
 
  * Focus on testing RobotService.run()
 
-Check the restart loop: test_run_hsrb, test_run_hsrc_emergency, test_run_hsrc_wireless
-When starting for the first time:
+Check restart loop: test_run_hsrb, test_run_hsrc_emergency, test_run_hsrc_wireless
+At initial startup:
 - launch_nodes(True) is called
-After watching:
-- Restart 1: When it stopped with emergency stop being True
-    term_nodes(False), launch_nodes(False) is called (partially stopped, restarted)
-- Restart 2: When it stopped with emergency stop being True, and then there is no operation for the specified time (specified by keep_nodes_time)
-    term_nodes(True), launch_nodes(True) is called (all nodes stopped, restarted)
-- Restart 3: When it stops as no topic from emergency stop came for a specified seconds (specified by watch_timeout)
-    term_nodes(True), launch_nodes(True) is called (all nodes stopped, restarted)
+After watch:
+- Restart 1: When it stops due to emergency stop being True
+    term_nodes(False), launch_nodes(False) are called (partial stop and restart)
+- Restart 2: When it stops due to emergency stop being True, and no operation occurs for a specified time (specified by keep_nodes_time)
+    term_nodes(True), launch_nodes(True) are called (stop and restart all nodes)
+- Restart 3: When no topic from the emergency stop is received for a specified number of seconds (specified by watch_timeout)
+    term_nodes(True), launch_nodes(True) are called (stop and restart all nodes)
 
- Test for default speech (Japanese): test_notify_default_ja
- On start
- - Speech "HSR start"
- On stop
- - Speech "Stopped"
+ Test default speech (Japanese): test_notify_default_ja
+ At startup
+ - Speaks "HSR Start"
+ At shutdown
+ - Speaks "Stopped"
 
- Test for PERSONAL_NAME setting speech (Japanese): test_notify_original_ja
+ Test speech with PERSONAL_NAME set (Japanese): test_notify_original_ja
+ Example: PERSONAL_NAME=Test
+ At startup
+ - Speaks "Test Start"
+ At shutdown
+ - Speaks "Test, Stopped"
+
+ Test default speech (English): test_notify_default_en
+ At startup
+ - Speaks "HSR start"
+ At shutdown
+ - Speaks "HSR stopped"
+
+ Test startup speech with PERSONAL_NAME set (English): test_notify_original_en
  Example: PERSONAL_NAME=test
- On start
- - Speech "Test start"
- On stop
- - Speech "Test, stopped"
-
- Test for default speech (English): test_notify_default_en
- On start
- - Speech "HSR start"
- On stop
- - Speech "HSR stopped"
-
- Test for PERSONAL_NAME setting speech on start (English): test_notify_original_en
- Example: PERSONAL_NAME=test
- On start
- - Speech "Test start"
- On stop
- - Speech "Test stopped"
+ At startup
+ - Speaks "test start"
+ At shutdown
+ - Speaks "test stopped"
 """
 
 import os
@@ -88,8 +88,8 @@ def wait_until(node, condition_function, timeout_sec=5.0, rate_hz=100.0):
         raise TypeError('Input condition_function must be callable')
     if timeout_sec <= 0.0:
         # https://docs.python.org/ja/3/library/exceptions.html
-        # When an operator or a function receives an argument that is of the correct type but has an inappropriate value,
-        # it is raised in situations where it cannot be described by a more specific exception like IndexError.
+        # When an operator or function receives arguments of the correct type but with inappropriate values,
+        # it is raised in situations that cannot be described by more specific exceptions like IndexError.
         raise ValueError('Timeout value must be positiv')
     if rate_hz < float_info.epsilon:
         raise ValueError('Evaluation frequency must be great enough')
@@ -126,7 +126,7 @@ def setup_node(mocker):
 
 
 class TestRobotService:
-    def exit(self):
+    def exit_test(self):
         self.service.running = False
         self.run_thread.join()
         self.service.node.destroy_node()
@@ -153,12 +153,12 @@ class TestRobotService:
         self.run_thread = threading.Thread(target=self.service.run, daemon=True)
         self.run_thread.start()
 
-        # Wait for the node to start, check the arguments of the initial start
+        # Wait for the nodes to launch and verify the initial startup arguments
         wait_until(self._node, lambda: not self.service.launch_nodes.call_count == 0)
         self.service.launch_nodes.assert_called_with(True)
 
     def check_restart_nodes(self, count, require_called):
-        u"""Wait for the node to fall and check the arguments, then wait for it to rise and check the arguments"""
+        u"""Wait for the nodes to shut down, verify arguments, then wait for them to launch and verify arguments"""
         wait_until(self._node, lambda: not self.service.term_nodes.call_count == count)
         self.service.term_nodes.assert_called_with(require_called)
 
@@ -173,23 +173,23 @@ class TestRobotService:
         self._node.create_subscription(DiagnosticArray, 'diagnostics', callback, 1)
         self.exec_run_method(robot_name=robot_name, watch_timeout=3)
 
-        # Emergency stop button pressed
+        # Emergency stop button is pressed
         self.publish(publisher, True)
         self._node.create_rate(5).sleep()
-        # Confirm that some nodes are restarted when the servo turns ON
+        # Verify that some nodes are restarted when the servo is turned ON
         self.publish(publisher, False)
         self.check_restart_nodes(0, True)
 
-        # Emergency stop button pressed
+        # Emergency stop button is pressed
         self.publish(publisher, True)
         self._node.create_rate(5).sleep()
-        # If there is no operation for 3 seconds (60.0 x 0.05 (s)), all nodes will stop
+        # If there is no operation for 3 seconds (60.0 x 0.05 (s)), all nodes are stopped
         self.check_restart_nodes(1, True)
 
-        # If more than 3 seconds elapse without a signal from the emergency stop, all nodes will stop (assuming the issuing node is dead)
+        # If no emergency stop signal is received for more than 3 seconds, all nodes are stopped (assuming the issuing node has died)
         self.check_restart_nodes(2, True)
 
-        self.exit()
+        self.exit_test()
 
     def test_run_hsrb(self, setup_node):
         runstop_pub = setup_node.create_publisher(Bool, "runstop_button", 1)
@@ -209,7 +209,7 @@ class TestRobotService:
 
     def _test_notify_impl(self, setup_node, lang, name):
         voice_messages = {'ja': {'default': ['HSR' + u'Start', u'Stopped'],
-                                 'test': ['Test' + u'Start', u'Test' + u',Stoppd']},
+                                 'test': ['test' + u'Start', u'test' + u', Stopped']},
                           'en': {'default': [u'HSR start', u'HSR stopped'],
                                  'test': [u'test start', u'test stopped']}}
 
@@ -221,31 +221,31 @@ class TestRobotService:
         self._node.create_subscription(DiagnosticArray, 'diagnostics', callback_diag, 1)
         self.exec_run_method(keep_nodes_time=10, lang=lang)
 
-        # Speech test at startup
+        # Test speech at startup
         self._check_voice(callback_talk, 1, voice_messages[lang][name][0])
 
-        # Speech test at shutdown
+        # Test speech at shutdown
         self.publish(runstop_pub, True)
         self._check_voice(callback_talk, 2, voice_messages[lang][name][1])
 
-        self.exit()
+        self.exit_test()
 
     def test_notify_default_ja(self, setup_node):
-        u"""Test for default speech (Japanese)"""
+        u"""Test default speech (Japanese)"""
         self._test_notify_impl(setup_node, 'ja', 'default')
 
     def test_notify_original_ja(self, setup_node):
-        u"""Test for PERSONAL_NAME setting speech (Japanese)"""
+        u"""Test speech with PERSONAL_NAME set (Japanese)"""
         os.environ['PERSONAL_NAME'] = u'test'
         self._test_notify_impl(setup_node, 'ja', 'test')
         os.environ.pop('PERSONAL_NAME', None)
 
     def test_notify_default_en(self, setup_node):
-        u"""Test for default speech (English)"""
+        u"""Test default speech (English)"""
         self._test_notify_impl(setup_node, 'en', 'default')
 
     def test_notify_original_en(self, setup_node):
-        u"""Test for PERSONAL_NAME setting speech (English)"""
+        u"""Test speech with PERSONAL_NAME set (English)"""
         os.environ['PERSONAL_NAME'] = 'test'
         self._test_notify_impl(setup_node, 'en', 'test')
         os.environ.pop('PERSONAL_NAME', None)
